@@ -14,7 +14,7 @@ export const DEFAULT_ITEMS: InvestmentItem[] = [
 ]
 
 export const ITEM_COLORS = [
-  '#1D9E75', '#185FA5', '#BA7517', '#7C3AED', '#DC2626', '#059669', '#D97706',
+  '#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EF4444', '#06B6D4', '#F97316',
 ]
 
 export interface SimState {

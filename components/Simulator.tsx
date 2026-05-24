@@ -8,6 +8,10 @@ type Tab = 'overview' | 'per-scale' | 'site' | 'compare'
 
 let nextId = DEFAULT_ITEMS.length
 
+function fill(value: number, min: number, max: number) {
+  return { '--fill-pct': `${((value - min) / (max - min)) * 100}%` } as React.CSSProperties
+}
+
 export default function Simulator() {
   const [items, setItems] = useState<InvestmentItem[]>(DEFAULT_ITEMS)
   const [rate, setRate] = useState(20)
@@ -79,7 +83,7 @@ export default function Simulator() {
               <div className="panel-body">
                 <div className="sec-label">Base cost structure (IDR Mio)</div>
 
-                {items.map((item, i) => (
+                {items.map((item) => (
                   <div key={item.id} className="cost-row editable">
                     <input
                       className="cost-name-input"
@@ -113,7 +117,7 @@ export default function Simulator() {
                   + Add item
                 </button>
 
-                <div className="cost-row total" style={{ marginTop: '8px' }}>
+                <div className="cost-row total" style={{ marginTop: '10px' }}>
                   <span className="cost-name">Total Investment</span>
                   <span className="cost-val">IDR {totalInvDisplay} Mio</span>
                 </div>
@@ -129,6 +133,7 @@ export default function Simulator() {
                   </div>
                   <input
                     type="range" min={10} max={30} value={rate} step={1}
+                    style={fill(rate, 10, 30)}
                     onChange={e => setRate(Number(e.target.value))}
                   />
                 </div>
@@ -140,6 +145,7 @@ export default function Simulator() {
                   </div>
                   <input
                     type="range" min={3} max={10} value={horizon} step={1}
+                    style={fill(horizon, 3, 10)}
                     onChange={e => setHorizon(Number(e.target.value))}
                   />
                 </div>
@@ -151,6 +157,7 @@ export default function Simulator() {
                   </div>
                   <input
                     type="range" min={50} max={250} value={totalScales} step={1}
+                    style={fill(totalScales, 50, 250)}
                     onChange={e => setTotalScales(Number(e.target.value))}
                   />
                 </div>
@@ -166,10 +173,10 @@ export default function Simulator() {
               <div className="panel-body">
                 <div className="formula-box">
                   <span className="comment">// Annual AMC</span><br />
-                  AMC = {totalInvDisplay} × {rate}% = <span>{d.amc.toFixed(1)}</span> Mio<br /><br />
+                  AMC = {totalInvDisplay} × {rate}% = <span style={{ color: '#A7F3D0' }}>{d.amc.toFixed(1)}</span> Mio<br /><br />
                   <span className="comment">// Perpetual per scale</span><br />
                   P = (AMC × {horizon}) ÷ {totalScales}<br />
-                  P = <span style={{ color: 'white', fontWeight: 500 }}>{fmio(d.perScale)}</span>
+                  P = <span style={{ color: 'white', fontWeight: 600 }}>{fmio(d.perScale)}</span>
                 </div>
                 <div className="note">
                   <strong>Validated (WD)</strong> = base × 1.20 — reflects GxP/CSV Annex 11 qualification overhead.<br />
@@ -247,16 +254,13 @@ export default function Simulator() {
                   <div style={{
                     display: 'grid',
                     gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)`,
-                    gap: '6px',
-                    marginTop: '8px',
+                    gap: '8px',
+                    marginTop: '10px',
                   }}>
                     {items.map((item, i) => (
                       <div key={item.id} className="metric-card">
                         <div className="m-label">{item.label || `Item ${i + 1}`} / scale</div>
-                        <div
-                          className="m-val"
-                          style={{ fontSize: '14px', color: ITEM_COLORS[i % ITEM_COLORS.length] }}
-                        >
+                        <div className="m-val" style={{ fontSize: '14px', color: ITEM_COLORS[i % ITEM_COLORS.length] }}>
                           {fmio(d.itemPortions[i])}
                         </div>
                       </div>
@@ -317,6 +321,7 @@ export default function Simulator() {
                     </div>
                     <input
                       type="range" min={1} max={60} value={siteWD} step={1}
+                      style={fill(siteWD, 1, 60)}
                       onChange={e => { setSiteWD(Number(e.target.value)); setSiteName('') }}
                     />
                   </div>
@@ -327,6 +332,7 @@ export default function Simulator() {
                     </div>
                     <input
                       type="range" min={0} max={30} value={siteCW} step={1}
+                      style={fill(siteCW, 0, 30)}
                       onChange={e => { setSiteCW(Number(e.target.value)); setSiteName('') }}
                     />
                   </div>
