@@ -19,8 +19,8 @@ export const ITEM_COLORS = [
 
 export interface SimState {
   items: InvestmentItem[]
-  rate: number        // AMC rate (%) — drives annual fee only
-  horizon: number     // AMC horizon (years) — drives annual fee only
+  rate: number        // AMC rate (%)
+  horizon: number     // AMC horizon (years)
   totalScales: number
   siteWD: number
   siteCW: number
@@ -29,7 +29,7 @@ export interface SimState {
 export interface CalcResult {
   totalInv: number
 
-  // Product 1 — Perpetual license (one-time, no AMC rate, no horizon)
+  // Product 1 — Perpetual license (one-time)
   perScale: number
   validated: number
   unvalidated: number
@@ -37,12 +37,9 @@ export interface CalcResult {
   siteCWcost: number
   siteTotal: number
 
-  // Product 2 — Annual support fee (recurring, AMC rate only)
+  // Product 2 — Annual support fee: flat = totalInv × AMC rate (not per scale)
   annualAMC: number
-  annualFeePerScale: number
-  annualFeePerScaleMo: number
-  annualFeeForSite: number
-  fiveYearSupportCost: number
+  cumulativeAMC: number   // annualAMC × horizon
 
   // Breakdown (% and per-scale share of investment)
   itemPortions: number[]
@@ -58,7 +55,7 @@ export function calc(state: SimState): CalcResult {
   const totalInv = state.items.reduce((sum, item) => sum + (item.value || 0), 0)
   const scales = state.totalScales || 1
 
-  // Product 1: Perpetual — total investment ÷ total scales (no AMC, no horizon)
+  // Product 1: Perpetual — total investment ÷ total scales
   const perScale = totalInv / scales
   const validated = perScale * 1.2
   const unvalidated = perScale * 0.8
@@ -66,12 +63,9 @@ export function calc(state: SimState): CalcResult {
   const siteCWcost = state.siteCW * unvalidated
   const siteTotal = siteWDcost + siteCWcost
 
-  // Product 2: Annual support fee — perpetual per scale × AMC rate (no division by total scales)
-  const annualFeePerScale = perScale * state.rate / 100
-  const annualFeePerScaleMo = annualFeePerScale / 12
-  const annualFeeForSite = (state.siteWD + state.siteCW) * annualFeePerScale
-  const annualAMC = annualFeePerScale * scales   // program-wide, derived from per-scale
-  const fiveYearSupportCost = annualFeeForSite * state.horizon
+  // Product 2: Annual support fee — flat constant = total investment × AMC rate
+  const annualAMC = totalInv * state.rate / 100
+  const cumulativeAMC = annualAMC * state.horizon
 
   // Item breakdown: perpetual share per scale per component
   const itemPortions = state.items.map(item => (item.value || 0) / scales)
@@ -79,7 +73,7 @@ export function calc(state: SimState): CalcResult {
     totalInv > 0 ? ((item.value || 0) / totalInv) * 100 : 0
   )
 
-  // vs Werum (compare against site perpetual one-time cost)
+  // vs Werum
   const werumYears: number[] = []
   let w = WERUM_BASE
   for (let i = 0; i < 5; i++) {
@@ -92,7 +86,7 @@ export function calc(state: SimState): CalcResult {
   return {
     totalInv,
     perScale, validated, unvalidated, siteWDcost, siteCWcost, siteTotal,
-    annualAMC, annualFeePerScale, annualFeePerScaleMo, annualFeeForSite, fiveYearSupportCost,
+    annualAMC, cumulativeAMC,
     itemPortions, itemPcts,
     werumYears, werumTotal, sav5yr,
   }

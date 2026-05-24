@@ -255,8 +255,8 @@ export default function Simulator() {
                   {'          '}= <span style={{ color: 'white', fontWeight: 600 }}>{fmio(d.perScale)}</span> per scale<br />
                   <br />
                   <span className="comment">// PRODUCT 2 — Annual support fee (recurring)</span><br />
-                  Annual{'    '}= {fmio(d.perScale)} × {rate}%<br />
-                  {'          '}= <span style={{ color: '#A7F3D0' }}>{fmio(d.annualFeePerScale)}</span> per scale / yr
+                  Annual{'    '}= {totalInvDisplay} × {rate}%<br />
+                  {'          '}= <span style={{ color: '#A7F3D0' }}>{fmio(d.annualAMC)}</span> / yr (whole program)
                 </div>
                 <div className="note">
                   <strong>WD (Higher complexity)</strong> = base × 1.20 — ERP BOM integration, multi-step CSV, deeper Oracle sync.<br />
@@ -294,17 +294,12 @@ export default function Simulator() {
                     <div className="metric-card" style={{ gridColumn: 'span 2' }}>
                       <div className="m-label">Annual AMC (whole program)</div>
                       <div className="m-val amber" style={{ fontSize: '22px' }}>{fmio(d.annualAMC)}</div>
-                      <div className="m-sub">Charged every year · {rate}% × perpetual per scale × {totalScales} scales</div>
+                      <div className="m-sub">Charged every year · Total Investment × {rate}%</div>
                     </div>
-                    <div className="metric-card">
-                      <div className="m-label">Annual fee / scale / year</div>
-                      <div className="m-val blue">{fmio(d.annualFeePerScale)}</div>
-                      <div className="m-sub">Across {totalScales} scales</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="m-label">Annual fee / scale / month</div>
-                      <div className="m-val">{fmio(d.annualFeePerScaleMo)}</div>
-                      <div className="m-sub">Monthly burden</div>
+                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
+                      <div className="m-label">Cumulative AMC over {horizon} years</div>
+                      <div className="m-val blue">{fmio(d.cumulativeAMC)}</div>
+                      <div className="m-sub">Annual AMC × {horizon} yr</div>
                     </div>
                   </div>
 
@@ -375,25 +370,15 @@ export default function Simulator() {
                   {/* Section B */}
                   <div className="sec-label">Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring · charged separately each year</span></div>
                   <div className="metric-grid">
-                    <div className="metric-card">
-                      <div className="m-label">Annual fee / scale / year</div>
-                      <div className="m-val blue">{fmio(d.annualFeePerScale)}</div>
-                      <div className="m-sub">Perpetual per scale × {rate}%</div>
+                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
+                      <div className="m-label">Annual AMC (whole program)</div>
+                      <div className="m-val amber">{fmio(d.annualAMC)}</div>
+                      <div className="m-sub">Total Investment × {rate}% — constant, not divided by scale count</div>
                     </div>
-                    <div className="metric-card">
-                      <div className="m-label">Annual fee / scale / month</div>
-                      <div className="m-val">{fmio(d.annualFeePerScaleMo)}</div>
-                      <div className="m-sub">Monthly equivalent</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="m-label">Annual fee for site ({siteScales} scales)</div>
-                      <div className="m-val amber">{fmio(d.annualFeeForSite)}</div>
-                      <div className="m-sub">{siteScales} scales × {fmio(d.annualFeePerScale)}</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="m-label">{horizon}-year total support cost</div>
-                      <div className="m-val">{fmio(d.fiveYearSupportCost)}</div>
-                      <div className="m-sub">Annual fee for site × {horizon} yr</div>
+                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
+                      <div className="m-label">Cumulative AMC over {horizon} years</div>
+                      <div className="m-val blue">{fmio(d.cumulativeAMC)}</div>
+                      <div className="m-sub">Annual AMC × {horizon} yr</div>
                     </div>
                   </div>
 
@@ -461,16 +446,16 @@ export default function Simulator() {
                     </div>
                   </div>
 
-                  <div className="sec-label" style={{ marginTop: '1rem' }}>Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring</span></div>
+                  <div className="sec-label" style={{ marginTop: '1rem' }}>Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring · program-wide constant</span></div>
                   <div className="metric-grid">
-                    <div className="metric-card">
-                      <div className="m-label">Annual fee for site</div>
-                      <div className="m-val amber">{fmio(d.annualFeeForSite)}</div>
-                      <div className="m-sub">{siteScales} scales × {fmio(d.annualFeePerScale)} / yr</div>
+                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
+                      <div className="m-label">Annual AMC (whole program)</div>
+                      <div className="m-val amber">{fmio(d.annualAMC)}</div>
+                      <div className="m-sub">Total Investment × {rate}% — not site-specific</div>
                     </div>
-                    <div className="metric-card">
-                      <div className="m-label">{horizon}-year total support</div>
-                      <div className="m-val">{fmio(d.fiveYearSupportCost)}</div>
+                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
+                      <div className="m-label">Cumulative AMC over {horizon} years</div>
+                      <div className="m-val">{fmio(d.cumulativeAMC)}</div>
                       <div className="m-sub">Annual × {horizon} years</div>
                     </div>
                   </div>
