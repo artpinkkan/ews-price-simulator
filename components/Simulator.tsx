@@ -123,6 +123,18 @@ export default function Simulator() {
                   <span className="cost-val">IDR {totalInvDisplay} Mio</span>
                 </div>
 
+                <div className="control-group" style={{ marginTop: '1rem' }}>
+                  <div className="control-label">
+                    <span>AMC horizon (years)</span>
+                    <span className="val">{horizon} yr</span>
+                  </div>
+                  <input
+                    type="range" min={1} max={10} value={horizon} step={1}
+                    style={fill(horizon, 1, 10)}
+                    onChange={e => setHorizon(Number(e.target.value))}
+                  />
+                </div>
+
                 <div className="divider" />
 
                 <div className="sec-label">Model parameters</div>
@@ -136,18 +148,6 @@ export default function Simulator() {
                     type="range" min={10} max={30} value={rate} step={1}
                     style={fill(rate, 10, 30)}
                     onChange={e => setRate(Number(e.target.value))}
-                  />
-                </div>
-
-                <div className="control-group">
-                  <div className="control-label">
-                    <span>AMC horizon (years)</span>
-                    <span className="val">{horizon} yr</span>
-                  </div>
-                  <input
-                    type="range" min={3} max={10} value={horizon} step={1}
-                    style={fill(horizon, 3, 10)}
-                    onChange={e => setHorizon(Number(e.target.value))}
                   />
                 </div>
 
