@@ -15,16 +15,15 @@ function fill(value: number, min: number, max: number) {
 export default function Simulator() {
   const [items, setItems] = useState<InvestmentItem[]>(DEFAULT_ITEMS)
   const [rate, setRate] = useState(20)
-  const [horizon, setHorizon] = useState(5)
   const [totalScales, setTotalScales] = useState(114)
-  const [siteWD, setSiteWD] = useState(8)
+  const [siteWD, setSiteWD] = useState(15)
   const [siteCW, setSiteCW] = useState(5)
   const [siteName, setSiteName] = useState('SAKA')
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
   const d = useMemo(
-    () => calc({ items, rate, horizon, totalScales, siteWD, siteCW }),
-    [items, rate, horizon, totalScales, siteWD, siteCW]
+    () => calc({ items, rate, totalScales, siteWD, siteCW }),
+    [items, rate, totalScales, siteWD, siteCW]
   )
 
   function updateLabel(id: string, label: string) {
@@ -52,6 +51,7 @@ export default function Simulator() {
   }
 
   const totalInvDisplay = d.totalInv.toLocaleString('en-US')
+  const siteScales = siteWD + siteCW
 
   return (
     <>
@@ -68,7 +68,7 @@ export default function Simulator() {
       <main className="main">
         <div className="page-title">
           <h1>Perpetual License Pricing Simulator</h1>
-          <p>AMC-based per-scale pricing model for the Electronic Weighing System rollout across Kalbe Group sites.</p>
+          <p>Two-product pricing model — perpetual license (one-time) and annual support fee (recurring) — for the Electronic Weighing System rollout across Kalbe Group sites.</p>
         </div>
 
         <div className="grid-2">
@@ -128,25 +128,13 @@ export default function Simulator() {
 
                 <div className="control-group">
                   <div className="control-label">
-                    <span>AMC Rate</span>
+                    <span>AMC Rate — drives annual support fee only</span>
                     <span className="val">{rate}%</span>
                   </div>
                   <input
                     type="range" min={10} max={30} value={rate} step={1}
                     style={fill(rate, 10, 30)}
                     onChange={e => setRate(Number(e.target.value))}
-                  />
-                </div>
-
-                <div className="control-group">
-                  <div className="control-label">
-                    <span>Perpetual horizon (years)</span>
-                    <span className="val">{horizon} yr</span>
-                  </div>
-                  <input
-                    type="range" min={3} max={10} value={horizon} step={1}
-                    style={fill(horizon, 3, 10)}
-                    onChange={e => setHorizon(Number(e.target.value))}
                   />
                 </div>
 
@@ -172,15 +160,17 @@ export default function Simulator() {
               </div>
               <div className="panel-body">
                 <div className="formula-box">
-                  <span className="comment">// Annual AMC</span><br />
-                  AMC = {totalInvDisplay} × {rate}% = <span style={{ color: '#A7F3D0' }}>{d.amc.toFixed(1)}</span> Mio<br /><br />
-                  <span className="comment">// Perpetual per scale</span><br />
-                  P = (AMC × {horizon}) ÷ {totalScales}<br />
-                  P = <span style={{ color: 'white', fontWeight: 600 }}>{fmio(d.perScale)}</span>
+                  <span className="comment">// PRODUCT 1 — Perpetual license (one-time)</span><br />
+                  Perpetual = {totalInvDisplay} ÷ {totalScales}<br />
+                  {'          '}= <span style={{ color: 'white', fontWeight: 600 }}>{fmio(d.perScale)}</span> per scale<br />
+                  <br />
+                  <span className="comment">// PRODUCT 2 — Annual support fee (recurring)</span><br />
+                  Annual{'    '}= ({totalInvDisplay} × {rate}%) ÷ {totalScales}<br />
+                  {'          '}= <span style={{ color: '#A7F3D0' }}>{fmio(d.annualFeePerScale)}</span> per scale / yr
                 </div>
                 <div className="note">
-                  <strong>WD (Higher complexity)</strong> = base × 1.20 — reflects GxP/CSV Annex 11 qualification overhead.<br />
-                  <strong>CW (Standard complexity)</strong> = base × 0.80 — standard setup, lower compliance burden.
+                  <strong>WD (Higher complexity)</strong> = base × 1.20 — ERP BOM integration, multi-step CSV, deeper Oracle sync.<br />
+                  <strong>CW (Standard complexity)</strong> = base × 0.80 — lighter ERP dependency, more standardized setup.
                 </div>
               </div>
             </div>
@@ -209,31 +199,26 @@ export default function Simulator() {
 
                 {/* TAB: Overview */}
                 <div className={`tab-pane${activeTab === 'overview' ? ' active' : ''}`}>
-                  <div className="sec-label">Program-level AMC</div>
+                  <div className="sec-label">Annual support fee — program level</div>
                   <div className="metric-grid">
-                    <div className="metric-card">
+                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
                       <div className="m-label">Annual AMC (whole program)</div>
-                      <div className="m-val amber">{fmio(d.amc)}</div>
-                      <div className="m-sub">Per year</div>
+                      <div className="m-val amber" style={{ fontSize: '22px' }}>{fmio(d.annualAMC)}</div>
+                      <div className="m-sub">Charged every year · {rate}% of IDR {totalInvDisplay} Mio</div>
                     </div>
                     <div className="metric-card">
-                      <div className="m-label">Cumulative over horizon</div>
-                      <div className="m-val">{fmio(d.cumAMC)}</div>
-                      <div className="m-sub">Over {horizon} years</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="m-label">AMC / scale / year</div>
-                      <div className="m-val blue">{fmio(d.amcPerScaleYr)}</div>
+                      <div className="m-label">Annual fee / scale / year</div>
+                      <div className="m-val blue">{fmio(d.annualFeePerScale)}</div>
                       <div className="m-sub">Across {totalScales} scales</div>
                     </div>
                     <div className="metric-card">
-                      <div className="m-label">AMC / scale / month</div>
-                      <div className="m-val">{fmio(d.amcPerScaleMo)}</div>
+                      <div className="m-label">Annual fee / scale / month</div>
+                      <div className="m-val">{fmio(d.annualFeePerScaleMo)}</div>
                       <div className="m-sub">Monthly burden</div>
                     </div>
                   </div>
 
-                  <div className="sec-label">Cost component breakdown</div>
+                  <div className="sec-label">Investment component breakdown</div>
                   <div className="bar-legend">
                     {items.map((item, i) => (
                       <div key={item.id} className="leg">
@@ -263,6 +248,7 @@ export default function Simulator() {
                         <div className="m-val" style={{ fontSize: '14px', color: ITEM_COLORS[i % ITEM_COLORS.length] }}>
                           {fmio(d.itemPortions[i])}
                         </div>
+                        <div className="m-sub">Perpetual share</div>
                       </div>
                     ))}
                   </div>
@@ -270,30 +256,59 @@ export default function Simulator() {
 
                 {/* TAB: Per Scale */}
                 <div className={`tab-pane${activeTab === 'per-scale' ? ' active' : ''}`}>
+
+                  {/* Section A */}
+                  <div className="sec-label">Section A — Perpetual License (one-time)</div>
                   <div className="metric-grid">
                     <div className="metric-card hero">
                       <div className="m-label">Base perpetual price per scale</div>
                       <div className="m-val">{fmio(d.perScale)}</div>
-                      <div className="m-sub">Cumulative AMC ÷ {totalScales} scales over {horizon} yr</div>
+                      <div className="m-sub">Total Investment ÷ {totalScales} scales · paid once</div>
                     </div>
                   </div>
 
-                  <div className="sec-label">Scale type pricing tiers</div>
                   <div className="tier-grid">
                     <div className="tier-card validated">
                       <span className="tier-tag wd">WD · Higher Complexity</span>
                       <div className="tier-price">{fmio(d.validated)}</div>
-                      <div className="tier-desc">+20% premium — GxP / CSV Annex 11 qualification overhead</div>
+                      <div className="tier-desc">+20% — ERP BOM integration, multi-step CSV, deeper Oracle sync</div>
                     </div>
                     <div className="tier-card unvalidated">
                       <span className="tier-tag cw">CW · Standard Complexity</span>
                       <div className="tier-price">{fmio(d.unvalidated)}</div>
-                      <div className="tier-desc">−20% — standard checkweighing, lighter compliance setup</div>
+                      <div className="tier-desc">−20% — lighter ERP dependency, more standardized setup</div>
+                    </div>
+                  </div>
+
+                  <div className="divider" />
+
+                  {/* Section B */}
+                  <div className="sec-label">Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring · charged separately each year</span></div>
+                  <div className="metric-grid">
+                    <div className="metric-card">
+                      <div className="m-label">Annual fee / scale / year</div>
+                      <div className="m-val blue">{fmio(d.annualFeePerScale)}</div>
+                      <div className="m-sub">(Total Inv × {rate}%) ÷ {totalScales}</div>
+                    </div>
+                    <div className="metric-card">
+                      <div className="m-label">Annual fee / scale / month</div>
+                      <div className="m-val">{fmio(d.annualFeePerScaleMo)}</div>
+                      <div className="m-sub">Monthly equivalent</div>
+                    </div>
+                    <div className="metric-card">
+                      <div className="m-label">Annual fee for site ({siteScales} scales)</div>
+                      <div className="m-val amber">{fmio(d.annualFeeForSite)}</div>
+                      <div className="m-sub">{siteScales} scales × {fmio(d.annualFeePerScale)}</div>
+                    </div>
+                    <div className="metric-card">
+                      <div className="m-label">5-year total support cost</div>
+                      <div className="m-val">{fmio(d.fiveYearSupportCost)}</div>
+                      <div className="m-sub">Annual fee for site × 5 yr</div>
                     </div>
                   </div>
 
                   <div className="note">
-                    Pricing applies once per physical scale as a one-time perpetual license. No annual renewal is required — ongoing support is handled separately through an annual support fee (if applicable).
+                    These two products are charged at different times and must never be added together. The perpetual license is a one-time settlement; the annual support fee is billed separately each year.
                   </div>
                 </div>
 
@@ -337,10 +352,11 @@ export default function Simulator() {
                     />
                   </div>
 
+                  <div className="sec-label">Section A — Perpetual License (one-time)</div>
                   <div className="metric-grid">
                     <div className="metric-card">
                       <div className="m-label">WD perpetual cost</div>
-                      <div className="m-val amber">{fmio(d.siteWDcost)}</div>
+                      <div className="m-val teal">{fmio(d.siteWDcost)}</div>
                       <div className="m-sub">{siteWD} scales × {fmio(d.validated)}</div>
                     </div>
                     <div className="metric-card">
@@ -351,14 +367,28 @@ export default function Simulator() {
                     <div className="metric-card hero">
                       <div className="m-label">Total perpetual (this site)</div>
                       <div className="m-val">{fmio(d.siteTotal)}</div>
-                      <div className="m-sub">One-time · {siteWD + siteCW} scales</div>
+                      <div className="m-sub">One-time · {siteScales} scales</div>
+                    </div>
+                  </div>
+
+                  <div className="sec-label" style={{ marginTop: '1rem' }}>Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring</span></div>
+                  <div className="metric-grid">
+                    <div className="metric-card">
+                      <div className="m-label">Annual fee for site</div>
+                      <div className="m-val amber">{fmio(d.annualFeeForSite)}</div>
+                      <div className="m-sub">{siteScales} scales × {fmio(d.annualFeePerScale)} / yr</div>
+                    </div>
+                    <div className="metric-card">
+                      <div className="m-label">5-year total support</div>
+                      <div className="m-val">{fmio(d.fiveYearSupportCost)}</div>
+                      <div className="m-sub">Annual × 5 years</div>
                     </div>
                   </div>
                 </div>
 
                 {/* TAB: vs Werum */}
                 <div className={`tab-pane${activeTab === 'compare' ? ' active' : ''}`}>
-                  <div className="sec-label">Site-level comparison (using current site selection)</div>
+                  <div className="sec-label">Site-level comparison — eWS perpetual (one-time) vs Werum recurring AMC</div>
                   <table className="comp-table">
                     <thead>
                       <tr>
