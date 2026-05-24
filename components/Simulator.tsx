@@ -179,8 +179,8 @@ export default function Simulator() {
                   P = <span style={{ color: 'white', fontWeight: 600 }}>{fmio(d.perScale)}</span>
                 </div>
                 <div className="note">
-                  <strong>Validated (WD)</strong> = base × 1.20 — reflects GxP/CSV Annex 11 qualification overhead.<br />
-                  <strong>Unvalidated (CW)</strong> = base × 0.80 — standard setup, lower compliance burden.
+                  <strong>WD (Higher complexity)</strong> = base × 1.20 — reflects GxP/CSV Annex 11 qualification overhead.<br />
+                  <strong>CW (Standard complexity)</strong> = base × 0.80 — standard setup, lower compliance burden.
                 </div>
               </div>
             </div>
@@ -281,12 +281,12 @@ export default function Simulator() {
                   <div className="sec-label">Scale type pricing tiers</div>
                   <div className="tier-grid">
                     <div className="tier-card validated">
-                      <span className="tier-tag wd">WD · Validated</span>
+                      <span className="tier-tag wd">WD · Higher Complexity</span>
                       <div className="tier-price">{fmio(d.validated)}</div>
                       <div className="tier-desc">+20% premium — GxP / CSV Annex 11 qualification overhead</div>
                     </div>
                     <div className="tier-card unvalidated">
-                      <span className="tier-tag cw">CW · Unvalidated</span>
+                      <span className="tier-tag cw">CW · Standard Complexity</span>
                       <div className="tier-price">{fmio(d.unvalidated)}</div>
                       <div className="tier-desc">−20% — standard checkweighing, lighter compliance setup</div>
                     </div>
@@ -316,7 +316,7 @@ export default function Simulator() {
                   <div className="sec-label">Or configure manually</div>
                   <div className="control-group">
                     <div className="control-label">
-                      <span>WD scales (validated)</span>
+                      <span>WD scales (higher complexity)</span>
                       <span className="val">{siteWD}</span>
                     </div>
                     <input
@@ -327,7 +327,7 @@ export default function Simulator() {
                   </div>
                   <div className="control-group">
                     <div className="control-label">
-                      <span>CW scales (unvalidated)</span>
+                      <span>CW scales (standard complexity)</span>
                       <span className="val">{siteCW}</span>
                     </div>
                     <input
