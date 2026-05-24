@@ -20,6 +20,7 @@ export const ITEM_COLORS = [
 export interface SimState {
   items: InvestmentItem[]
   rate: number        // AMC rate (%) — drives annual fee only
+  horizon: number     // AMC horizon (years) — drives annual fee only
   totalScales: number
   siteWD: number
   siteCW: number
@@ -70,7 +71,7 @@ export function calc(state: SimState): CalcResult {
   const annualFeePerScale = annualAMC / scales
   const annualFeePerScaleMo = annualFeePerScale / 12
   const annualFeeForSite = (state.siteWD + state.siteCW) * annualFeePerScale
-  const fiveYearSupportCost = annualFeeForSite * 5
+  const fiveYearSupportCost = annualFeeForSite * state.horizon
 
   // Item breakdown: perpetual share per scale per component
   const itemPortions = state.items.map(item => (item.value || 0) / scales)

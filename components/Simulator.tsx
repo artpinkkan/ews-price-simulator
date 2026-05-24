@@ -15,6 +15,7 @@ function fill(value: number, min: number, max: number) {
 export default function Simulator() {
   const [items, setItems] = useState<InvestmentItem[]>(DEFAULT_ITEMS)
   const [rate, setRate] = useState(20)
+  const [horizon, setHorizon] = useState(5)
   const [totalScales, setTotalScales] = useState(114)
   const [siteWD, setSiteWD] = useState(15)
   const [siteCW, setSiteCW] = useState(5)
@@ -22,8 +23,8 @@ export default function Simulator() {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
   const d = useMemo(
-    () => calc({ items, rate, totalScales, siteWD, siteCW }),
-    [items, rate, totalScales, siteWD, siteCW]
+    () => calc({ items, rate, horizon, totalScales, siteWD, siteCW }),
+    [items, rate, horizon, totalScales, siteWD, siteCW]
   )
 
   function updateLabel(id: string, label: string) {
@@ -135,6 +136,18 @@ export default function Simulator() {
                     type="range" min={10} max={30} value={rate} step={1}
                     style={fill(rate, 10, 30)}
                     onChange={e => setRate(Number(e.target.value))}
+                  />
+                </div>
+
+                <div className="control-group">
+                  <div className="control-label">
+                    <span>AMC horizon (years)</span>
+                    <span className="val">{horizon} yr</span>
+                  </div>
+                  <input
+                    type="range" min={3} max={10} value={horizon} step={1}
+                    style={fill(horizon, 3, 10)}
+                    onChange={e => setHorizon(Number(e.target.value))}
                   />
                 </div>
 
@@ -301,9 +314,9 @@ export default function Simulator() {
                       <div className="m-sub">{siteScales} scales × {fmio(d.annualFeePerScale)}</div>
                     </div>
                     <div className="metric-card">
-                      <div className="m-label">5-year total support cost</div>
+                      <div className="m-label">{horizon}-year total support cost</div>
                       <div className="m-val">{fmio(d.fiveYearSupportCost)}</div>
-                      <div className="m-sub">Annual fee for site × 5 yr</div>
+                      <div className="m-sub">Annual fee for site × {horizon} yr</div>
                     </div>
                   </div>
 
@@ -379,9 +392,9 @@ export default function Simulator() {
                       <div className="m-sub">{siteScales} scales × {fmio(d.annualFeePerScale)} / yr</div>
                     </div>
                     <div className="metric-card">
-                      <div className="m-label">5-year total support</div>
+                      <div className="m-label">{horizon}-year total support</div>
                       <div className="m-val">{fmio(d.fiveYearSupportCost)}</div>
-                      <div className="m-sub">Annual × 5 years</div>
+                      <div className="m-sub">Annual × {horizon} years</div>
                     </div>
                   </div>
                 </div>
