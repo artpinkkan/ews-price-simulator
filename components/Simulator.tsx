@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { calc, SITES, DEFAULT_ITEMS, ITEM_COLORS, type InvestmentItem } from '@/lib/calc'
 import { fmio } from '@/lib/format'
+import { loadState, saveState, clearState, exportJSON, importJSON } from '@/lib/storage'
 
 type Tab = 'overview' | 'per-scale' | 'site' | 'compare'
 
@@ -21,6 +22,34 @@ export default function Simulator() {
   const [siteCW, setSiteCW] = useState(5)
   const [siteName, setSiteName] = useState('SAKA')
   const [activeTab, setActiveTab] = useState<Tab>('overview')
+  const [savedAt, setSavedAt] = useState<string | null>(null)
+  const isFirstRender = useRef(true)
+
+  // Load persisted state on mount
+  useEffect(() => {
+    const saved = loadState()
+    if (saved) {
+      setItems(saved.items)
+      setRate(saved.rate)
+      setHorizon(saved.horizon)
+      setTotalScales(saved.totalScales)
+      setSiteWD(saved.siteWD)
+      setSiteCW(saved.siteCW)
+      setSiteName(saved.siteName)
+      // keep nextId above any loaded item ids
+      const maxId = Math.max(...saved.items.map(it => Number(it.id) || 0))
+      if (maxId >= nextId) nextId = maxId + 1
+    }
+    isFirstRender.current = false
+  }, [])
+
+  // Auto-save whenever state changes (skip the initial mount)
+  useEffect(() => {
+    if (isFirstRender.current) return
+    saveState({ items, rate, horizon, totalScales, siteWD, siteCW, siteName })
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    setSavedAt(now)
+  }, [items, rate, horizon, totalScales, siteWD, siteCW, siteName])
 
   const d = useMemo(
     () => calc({ items, rate, horizon, totalScales, siteWD, siteCW }),
@@ -51,6 +80,38 @@ export default function Simulator() {
     setSiteCW(site.cw)
   }
 
+  function handleReset() {
+    if (!confirm('Reset all values to defaults?')) return
+    clearState()
+    setItems(DEFAULT_ITEMS)
+    setRate(20)
+    setHorizon(5)
+    setTotalScales(114)
+    setSiteWD(15)
+    setSiteCW(5)
+    setSiteName('SAKA')
+    setSavedAt(null)
+  }
+
+  function handleExport() {
+    exportJSON({ items, rate, horizon, totalScales, siteWD, siteCW, siteName })
+  }
+
+  async function handleImport() {
+    try {
+      const state = await importJSON()
+      setItems(state.items)
+      setRate(state.rate)
+      setHorizon(state.horizon)
+      setTotalScales(state.totalScales)
+      setSiteWD(state.siteWD)
+      setSiteCW(state.siteCW)
+      setSiteName(state.siteName)
+    } catch {
+      alert('Could not read file. Make sure it is a valid eWS simulator JSON.')
+    }
+  }
+
   const totalInvDisplay = d.totalInv.toLocaleString('en-US')
   const siteScales = siteWD + siteCW
 
@@ -63,7 +124,23 @@ export default function Simulator() {
             <span>eWS</span> Pricing Simulator
           </span>
         </div>
-        <span className="header-badge">Kalbe Group · Internal</span>
+        <div className="storage-bar">
+          {savedAt && (
+            <span className="save-indicator">
+              <span className="save-dot" />
+              Saved {savedAt}
+            </span>
+          )}
+          <button className="icon-btn" onClick={handleImport} title="Import configuration">
+            ↑ Import
+          </button>
+          <button className="icon-btn" onClick={handleExport} title="Export configuration">
+            ↓ Export
+          </button>
+          <button className="icon-btn danger" onClick={handleReset} title="Reset to defaults">
+            Reset
+          </button>
+        </div>
       </header>
 
       <main className="main">
