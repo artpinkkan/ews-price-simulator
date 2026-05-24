@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eWS Pricing Simulator — Kalbe Group</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:       #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark:  #0F6E56;
+    --teal-mid:   #5DCAA5;
+    --navy:       #042C53;
+    --blue:       #185FA5;
+    --blue-light: #E6F1FB;
+    --amber:      #BA7517;
+    --amber-light:#FAEEDA;
+    --gray-50:    #F7F7F5;
+    --gray-100:   #EBEBEA;
+    --gray-300:   #C5C5C3;
+    --gray-500:   #888780;
+    --gray-800:   #2C2C2A;
+    --white:      #FFFFFF;
+    --text:       #1a1a18;
+    --text-muted: #6b6b68;
+    --border:     rgba(0,0,0,0.08);
+    --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-lg:  0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+    --radius:     12px;
+    --radius-sm:  8px;
+    --radius-lg:  16px;
+    --font:       'Sora', sans-serif;
+    --mono:       'DM Mono', monospace;
+  }
+
+  html { font-size: 15px; }
+  body {
+    font-family: var(--font);
+    background: var(--gray-50);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--teal);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px; color: white;
+    letter-spacing: -0.02em;
+  }
+  .header-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .header-title span {
+    color: var(--teal-dark);
+  }
+  .header-badge {
+    font-size: 11px;
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-family: var(--mono);
+  }
+
+  /* LAYOUT */
+  .main {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .page-title {
+    margin-bottom: 2rem;
+  }
+  .page-title h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .page-title p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .header { padding: 0 1rem; }
+    .main { padding: 1.5rem 1rem 3rem; }
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-header .icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: var(--teal-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .panel-header h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .panel-body { padding: 1.25rem; }
+
+  /* SECTION LABEL */
+  .sec-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 10px;
+  }
+
+  /* SLIDERS */
+  .control-group { margin-bottom: 1.25rem; }
+  .control-group:last-child { margin-bottom: 0; }
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .control-label span:first-child {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .control-label .val {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--teal-dark);
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--gray-100);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: var(--teal);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--teal);
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    background: var(--teal);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--teal);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1rem 0;
+  }
+
+  /* COST TABLE in inputs */
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .cost-row:last-child { border-bottom: none; }
+  .cost-row .cost-name { color: var(--text-muted); }
+  .cost-row .cost-val {
+    font-family: var(--mono);
+    font-weight: 500;
+    color: var(--text);
+  }
+  .cost-row.total .cost-name { font-weight: 600; color: var(--text); font-size: 13px; }
+  .cost-row.total .cost-val { font-size: 14px; color: var(--teal-dark); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--gray-50);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 1.25rem;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font);
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .tab-btn.active {
+    background: var(--white);
+    color: var(--teal-dark);
+    box-shadow: var(--shadow-sm);
+  }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* METRIC CARDS */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .metric-card {
+    background: var(--gray-50);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+  }
+  .metric-card .m-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .metric-card .m-val {
+    font-family: var(--mono);
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text);
+  }
+  .metric-card .m-val.teal { color: var(--teal-dark); }
+  .metric-card .m-val.blue { color: var(--blue); }
+  .metric-card .m-val.amber { color: var(--amber); }
+  .metric-card .m-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .metric-card.hero {
+    grid-column: span 2;
+    background: var(--teal-light);
+    border-color: var(--teal-mid);
+    padding: 1rem;
+  }
+  .metric-card.hero .m-label { color: var(--teal-dark); }
+  .metric-card.hero .m-val { font-size: 26px; color: var(--teal-dark); }
+  .metric-card.hero .m-sub { color: var(--teal-dark); opacity: 0.75; }
+
+  /* PRICING TIER */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 1rem 0;
+  }
+  .tier-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.875rem;
+    background: var(--white);
+  }
+  .tier-card.validated { border-color: var(--teal-mid); background: var(--teal-light); }
+  .tier-card.unvalidated { border-color: #B5D4F4; background: var(--blue-light); }
+  .tier-tag {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .tier-tag.wd { background: var(--teal-dark); color: white; }
+  .tier-tag.cw { background: var(--blue); color: white; }
+  .tier-price {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .tier-card.validated .tier-price { color: var(--teal-dark); }
+  .tier-card.unvalidated .tier-price { color: var(--blue); }
+  .tier-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .tier-card.validated .tier-desc { color: #0F6E56; }
+  .tier-card.unvalidated .tier-desc { color: #185FA5; }
+
+  /* COMPARISON TABLE */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 0.5rem;
+  }
+  .comp-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gray-500);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-table td {
+    padding: 8px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table td.num {
+    text-align: right;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+  .comp-table td.savings { color: var(--teal-dark); font-weight: 600; }
+  .comp-table tr.total td { font-weight: 600; background: var(--gray-50); }
+
+  /* SITE SELECTOR */
+  .site-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 1rem;
+  }
+  .site-btn {
+    padding: 8px 4px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--text-muted);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .site-btn:hover { border-color: var(--teal-mid); color: var(--teal-dark); }
+  .site-btn.active { background: var(--teal-light); border-color: var(--teal-mid); color: var(--teal-dark); font-weight: 600; }
+  .site-btn .site-count { display: block; font-family: var(--mono); font-size: 14px; margin-top: 2px; color: inherit; }
+
+  /* SAVINGS BANNER */
+  .savings-banner {
+    background: linear-gradient(135deg, var(--teal-dark) 0%, #0a5442 100%);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    gap: 12px;
+  }
+  .savings-banner .s-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .savings-banner .s-val {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: white;
+  }
+  .savings-banner .s-badge {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* NOTE */
+  .note {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+  .note strong { color: var(--text); font-weight: 500; }
+
+  /* FORMULA BOX */
+  .formula-box {
+    background: var(--gray-800);
+    border-radius: var(--radius-sm);
+    padding: 0.875rem 1rem;
+    margin: 0.75rem 0;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: #9FE1CB;
+    line-height: 1.8;
+  }
+  .formula-box .comment { color: var(--gray-500); }
+
+  /* BREAKDOWN BAR */
+  .breakdown-bar {
+    height: 8px;
+    border-radius: 4px;
+    display: flex;
+    overflow: hidden;
+    margin: 8px 0;
+    gap: 2px;
+  }
+  .breakdown-bar .seg {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .bar-legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+  .bar-legend .leg {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .bar-legend .dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 11px;
+    color: var(--gray-500);
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+    background: var(--white);
+  }
+  .footer span { color: var(--teal-dark); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="logo-mark">eWS</div>
+    <span class="header-title"><span>eWS</span> Pricing Simulator</span>
+  </div>
+  <span class="header-badge">Kalbe Group · Internal</span>
+</header>
+
+<main class="main">
+  <div class="page-title">
+    <h1>Perpetual License Pricing Simulator</h1>
+    <p>AMC-based per-scale pricing model for the Electronic Weighing System rollout across Kalbe Group sites.</p>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- LEFT: INPUTS -->
+    <div>
+      <!-- Investment Components -->
+      <div class="panel" style="margin-bottom:1rem;">
+        <div class="panel-header">
+          <div class="icon">💰</div>
+          <h2>Investment Components</h2>
+        </div>
+        <div class="panel-body">
+          <div class="sec-label">Base cost structure (IDR Mio)</div>
+          <div class="cost-row">
+            <span class="cost-name">Product R&D & Dev Readiness</span>
+            <span class="cost-val">720</span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-name">Hardware IT, Machinery & Equipment</span>
+            <span class="cost-val">322</span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-name">After-Sales Support (L3, L4)</span>
+            <span class="cost-val">720</span>
+          </div>
+          <div class="cost-row total">
+            <span class="cost-name">Total Investment</span>
+            <span class="cost-val">IDR 1,762 Mio</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="sec-label">Model parameters</div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>AMC Rate</span>
+              <span class="val" id="amcRateVal">20%</span>
+            </div>
+            <input type="range" id="amcRate" min="10" max="30" value="20" step="1" oninput="recalc()">
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Perpetual horizon (years)</span>
+              <span class="val" id="horizonVal">5 yr</span>
+            </div>
+            <input type="range" id="horizon" min="3" max="10" value="5" step="1" oninput="recalc()">
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Total active scales (Kalbe Group)</span>
+              <span class="val" id="totalScalesVal">114</span>
+            </div>
+            <input type="range" id="totalScales" min="50" max="250" value="114" step="1" oninput="recalc()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Formula -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="icon">🧮</div>
+          <h2>Pricing formula</h2>
+        </div>
+        <div class="panel-body">
+          <div class="formula-box">
+            <span class="comment">// Annual AMC</span><br>
+            AMC = 1,762 × <span id="f-rate">20</span>% = <span id="f-amc">352.4</span> Mio<br><br>
+            <span class="comment">// Perpetual per scale</span><br>
+            P = (AMC × <span id="f-horizon">5</span>) ÷ <span id="f-scales">114</span><br>
+            P = <span id="f-result" style="color:white; font-weight:500;">15.46 Mio</span>
+          </div>
+          <div class="note">
+            <strong>Validated (WD)</strong> = base × 1.20 — reflects GxP/CSV Annex 11 qualification overhead.<br>
+            <strong>Unvalidated (CW)</strong> = base × 0.80 — standard setup, lower compliance burden.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULTS -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="icon">📊</div>
+          <h2>Simulation results</h2>
+        </div>
+        <div class="panel-body">
+
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('per-scale')">Per scale</button>
+            <button class="tab-btn" onclick="switchTab('site')">Site view</button>
+            <button class="tab-btn" onclick="switchTab('compare')">vs Werum</button>
+          </div>
+
+          <!-- TAB: Overview -->
+          <div class="tab-pane active" id="tab-overview">
+            <div class="sec-label">Program-level AMC</div>
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="m-label">Annual AMC (whole program)</div>
+                <div class="m-val amber" id="ov-amc">IDR 352 Mio</div>
+                <div class="m-sub">Per year</div>
+              </div>
+              <div class="metric-card">
+                <div class="m-label">Cumulative over horizon</div>
+                <div class="m-val" id="ov-cumulative">IDR 1,762 Mio</div>
+                <div class="m-sub" id="ov-cumulative-sub">Over 5 years</div>
+              </div>
+              <div class="metric-card">
+                <div class="m-label">AMC / scale / year</div>
+                <div class="m-val blue" id="ov-per-scale-yr">IDR 3.09 Mio</div>
+                <div class="m-sub" id="ov-scales-note">Across 114 scales</div>
+              </div>
+              <div class="metric-card">
+                <div class="m-label">AMC / scale / month</div>
+                <div class="m-val" id="ov-per-scale-mo">IDR 257 K</div>
+                <div class="m-sub">Monthly burden</div>
+              </div>
+            </div>
+
+            <div class="sec-label">Cost component breakdown</div>
+            <div class="bar-legend">
+              <div class="leg"><div class="dot" style="background:#1D9E75;"></div>R&D (720)</div>
+              <div class="leg"><div class="dot" style="background:#185FA5;"></div>Hardware (322)</div>
+              <div class="leg"><div class="dot" style="background:#BA7517;"></div>After-Sales (720)</div>
+            </div>
+            <div class="breakdown-bar">
+              <div class="seg" id="bar-rd" style="background:#1D9E75; width:40.86%;"></div>
+              <div class="seg" id="bar-hw" style="background:#185FA5; width:18.28%;"></div>
+              <div class="seg" id="bar-as" style="background:#BA7517; width:40.86%;"></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px;">
+              <div class="metric-card">
+                <div class="m-label">R&D portion / scale</div>
+                <div class="m-val teal" style="font-size:14px;" id="ov-rd">IDR 6.32 Mio</div>
+              </div>
+              <div class="metric-card">
+                <div class="m-label">Hardware portion</div>
+                <div class="m-val blue" style="font-size:14px;" id="ov-hw">IDR 2.83 Mio</div>
+              </div>
+              <div class="metric-card">
+                <div class="m-label">After-Sales portion</div>
+                <div class="m-val amber" style="font-size:14px;" id="ov-as">IDR 6.32 Mio</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: Per Scale -->
+          <div class="tab-pane" id="tab-per-scale">
+            <div class="metric-grid">
+              <div class="metric-card hero">
+                <div class="m-label">Base perpetual price per scale</div>
+                <div class="m-val" id="ps-base">IDR 15.46 Mio</div>
+                <div class="m-sub" id="ps-base-sub">Cumulative AMC ÷ 114 scales over 5 years</div>
+              </div>
+            </div>
+
+            <div class="sec-label">Scale type pricing tiers</div>
+            <div class="tier-grid">
+              <div class="tier-card validated">
+                <span class="tier-tag wd">WD · Validated</span>
+                <div class="tier-price" id="ps-wd">IDR 18.55 Mio</div>
+                <div class="tier-desc">+20% premium — GxP / CSV Annex 11 qualification overhead</div>
+              </div>
+              <div class="tier-card unvalidated">
+                <span class="tier-tag cw">CW · Unvalidated</span>
+                <div class="tier-price" id="ps-cw">IDR 12.37 Mio</div>
+                <div class="tier-desc">−20% — standard checkweighing, lighter compliance setup</div>
+              </div>
+            </div>
+
+            <div class="note">
+              Pricing applies once per physical scale as a one-time perpetual license. No annual renewal is required — ongoing support is handled separately through an annual support fee (if applicable).
+            </div>
+          </div>
+
+          <!-- TAB: Site View -->
+          <div class="tab-pane" id="tab-site">
+            <div class="sec-label">Quick-select site (actual fleet data)</div>
+            <div class="site-selector">
+              <button class="site-btn active" onclick="selectSite('SAKA',8,5)" id="site-SAKA">
+                SAKA<span class="site-count">13</span>
+              </button>
+              <button class="site-btn" onclick="selectSite('FIMA',3,3)" id="site-FIMA">
+                FIMA<span class="site-count">6</span>
+              </button>
+              <button class="site-btn" onclick="selectSite('DANKOS',23,9)" id="site-DANKOS">
+                DANKOS<span class="site-count">32</span>
+              </button>
+              <button class="site-btn" onclick="selectSite('KF',47,9)" id="site-KF">
+                KF<span class="site-count">56</span>
+              </button>
+            </div>
+
+            <div class="sec-label">Or configure manually</div>
+            <div class="control-group">
+              <div class="control-label">
+                <span>WD scales (validated)</span>
+                <span class="val" id="siteWDval">8</span>
+              </div>
+              <input type="range" id="siteWD" min="1" max="60" value="8" step="1" oninput="siteManual()">
+            </div>
+            <div class="control-group">
+              <div class="control-label">
+                <span>CW scales (unvalidated)</span>
+                <span class="val" id="siteCWval">5</span>
+              </div>
+              <input type="range" id="siteCW" min="0" max="30" value="5" step="1" oninput="siteManual()">
+            </div>
+
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="m-label">WD perpetual cost</div>
+                <div class="m-val amber" id="s-wd-cost">IDR 148.4 Mio</div>
+                <div class="m-sub" id="s-wd-sub">8 scales × 18.55</div>
+              </div>
+              <div class="metric-card">
+                <div class="m-label">CW perpetual cost</div>
+                <div class="m-val blue" id="s-cw-cost">IDR 61.8 Mio</div>
+                <div class="m-sub" id="s-cw-sub">5 scales × 12.37</div>
+              </div>
+              <div class="metric-card hero">
+                <div class="m-label">Total perpetual (this site)</div>
+                <div class="m-val" id="s-total">IDR 210.2 Mio</div>
+                <div class="m-sub" id="s-total-sub">One-time · 13 scales</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: vs Werum -->
+          <div class="tab-pane" id="tab-compare">
+            <div class="sec-label">Site-level comparison (using current site selection)</div>
+            <table class="comp-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th style="text-align:right;">eWS perpetual</th>
+                  <th style="text-align:right;">Werum AMC</th>
+                  <th style="text-align:right;">Savings</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Year 1</td>
+                  <td class="num" id="cmp-ews-y1">IDR 210 Mio</td>
+                  <td class="num">IDR 750 Mio</td>
+                  <td class="num savings" id="cmp-sav-y1">IDR 540 Mio</td>
+                </tr>
+                <tr>
+                  <td>Year 2</td>
+                  <td class="num">—</td>
+                  <td class="num" id="cmp-werum-y2">IDR 788 Mio</td>
+                  <td class="num savings" id="cmp-sav-y2">IDR 788 Mio</td>
+                </tr>
+                <tr>
+                  <td>Year 3</td>
+                  <td class="num">—</td>
+                  <td class="num" id="cmp-werum-y3">IDR 827 Mio</td>
+                  <td class="num savings" id="cmp-sav-y3">IDR 827 Mio</td>
+                </tr>
+                <tr>
+                  <td>Year 4</td>
+                  <td class="num">—</td>
+                  <td class="num" id="cmp-werum-y4">IDR 868 Mio</td>
+                  <td class="num savings" id="cmp-sav-y4">IDR 868 Mio</td>
+                </tr>
+                <tr>
+                  <td>Year 5</td>
+                  <td class="num">—</td>
+                  <td class="num" id="cmp-werum-y5">IDR 911 Mio</td>
+                  <td class="num savings" id="cmp-sav-y5">IDR 911 Mio</td>
+                </tr>
+                <tr class="total">
+                  <td>5-year total</td>
+                  <td class="num" id="cmp-ews-total">IDR 210 Mio</td>
+                  <td class="num" id="cmp-werum-total">IDR 4,144 Mio</td>
+                  <td class="num savings" id="cmp-sav-total">IDR 3,934 Mio</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="savings-banner">
+              <div>
+                <div class="s-label">5-year cost avoidance (this site)</div>
+                <div class="s-val" id="banner-savings">IDR 3,934 Mio</div>
+              </div>
+              <div class="s-badge" id="banner-pct">95% reduction</div>
+            </div>
+
+            <div class="note">
+              Werum AMC assumed at IDR 750 Mio/site/year base, increasing 5% annually (per feasibility study). eWS perpetual is paid once with no recurring scale fee.
+            </div>
+          </div>
+
+        </div><!-- /panel-body -->
+      </div><!-- /panel -->
+    </div><!-- /right -->
+  </div><!-- /grid -->
+</main>
+
+<footer class="footer">
+  eWS Pricing Simulator · <span>Corporate Digital Technology</span> · Kalbe Group · Internal use only
+</footer>
+
+<script>
+  const INV = { rd: 720, hw: 322, as_: 720 };
+  const TOTAL_INV = 1762;
+  const WERUM_BASE = 750;
+  const WERUM_GROWTH = 0.05;
+
+  let state = {
+    rate: 20,
+    horizon: 5,
+    totalScales: 114,
+    siteWD: 8,
+    siteCW: 5,
+    siteName: 'SAKA'
+  };
+
+  function fmio(n) {
+    if (n === 0) return '—';
+    if (n >= 1000) return 'IDR ' + (n/1000).toFixed(2).replace(/\.00$/,'') + ' Bio';
+    if (n >= 1) return 'IDR ' + n.toFixed(1).replace(/\.0$/,'') + ' Mio';
+    return 'IDR ' + Math.round(n*1000) + ' K';
+  }
+  function fmioInt(n) {
+    return 'IDR ' + Math.round(n).toLocaleString() + ' Mio';
+  }
+
+  function calc() {
+    const amc = TOTAL_INV * state.rate / 100;
+    const cumAMC = amc * state.horizon;
+    const perScale = cumAMC / state.totalScales;
+    const validated = perScale * 1.2;
+    const unvalidated = perScale * 0.8;
+    const amcPerScaleYr = amc / state.totalScales;
+    const amcPerScaleMo = amcPerScaleYr / 12;
+
+    const rdPortion = (INV.rd * state.rate/100 * state.horizon) / state.totalScales;
+    const hwPortion = (INV.hw * state.rate/100 * state.horizon) / state.totalScales;
+    const asPortion = (INV.as_ * state.rate/100 * state.horizon) / state.totalScales;
+
+    const siteWDcost = state.siteWD * validated;
+    const siteCWcost = state.siteCW * unvalidated;
+    const siteTotal = siteWDcost + siteCWcost;
+
+    // Werum 5-yr with growth
+    const werumYears = [];
+    let w = WERUM_BASE;
+    for (let i=0; i<5; i++) {
+      werumYears.push(w);
+      w = w * (1 + WERUM_GROWTH);
+    }
+    const werumTotal = werumYears.reduce((a,b)=>a+b,0);
+    const sav5yr = werumTotal - siteTotal;
+
+    return { amc, cumAMC, perScale, validated, unvalidated, amcPerScaleYr, amcPerScaleMo,
+             rdPortion, hwPortion, asPortion, siteWDcost, siteCWcost, siteTotal,
+             werumYears, werumTotal, sav5yr };
+  }
+
+  function recalc() {
+    state.rate = parseInt(document.getElementById('amcRate').value);
+    state.horizon = parseInt(document.getElementById('horizon').value);
+    state.totalScales = parseInt(document.getElementById('totalScales').value);
+
+    document.getElementById('amcRateVal').textContent = state.rate + '%';
+    document.getElementById('horizonVal').textContent = state.horizon + ' yr';
+    document.getElementById('totalScalesVal').textContent = state.totalScales;
+
+    const d = calc();
+
+    // Formula
+    document.getElementById('f-rate').textContent = state.rate;
+    document.getElementById('f-amc').textContent = d.amc.toFixed(1);
+    document.getElementById('f-horizon').textContent = state.horizon;
+    document.getElementById('f-scales').textContent = state.totalScales;
+    document.getElementById('f-result').textContent = fmio(d.perScale);
+
+    // Overview tab
+    document.getElementById('ov-amc').textContent = fmio(d.amc);
+    document.getElementById('ov-cumulative').textContent = fmio(d.cumAMC);
+    document.getElementById('ov-cumulative-sub').textContent = 'Over ' + state.horizon + ' years';
+    document.getElementById('ov-per-scale-yr').textContent = fmio(d.amcPerScaleYr);
+    document.getElementById('ov-scales-note').textContent = 'Across ' + state.totalScales + ' scales';
+    document.getElementById('ov-per-scale-mo').textContent = fmio(d.amcPerScaleMo);
+    document.getElementById('ov-rd').textContent = fmio(d.rdPortion);
+    document.getElementById('ov-hw').textContent = fmio(d.hwPortion);
+    document.getElementById('ov-as').textContent = fmio(d.asPortion);
+
+    const rdPct = (INV.rd / TOTAL_INV * 100).toFixed(1);
+    const hwPct = (INV.hw / TOTAL_INV * 100).toFixed(1);
+    const asPct = (INV.as_ / TOTAL_INV * 100).toFixed(1);
+    document.getElementById('bar-rd').style.width = rdPct + '%';
+    document.getElementById('bar-hw').style.width = hwPct + '%';
+    document.getElementById('bar-as').style.width = asPct + '%';
+
+    // Per scale tab
+    document.getElementById('ps-base').textContent = fmio(d.perScale);
+    document.getElementById('ps-base-sub').textContent = 'Cumulative AMC ÷ ' + state.totalScales + ' scales over ' + state.horizon + ' yr';
+    document.getElementById('ps-wd').textContent = fmio(d.validated);
+    document.getElementById('ps-cw').textContent = fmio(d.unvalidated);
+
+    // Site tab
+    updateSiteUI(d);
+
+    // Compare tab
+    updateCompareUI(d);
+  }
+
+  function updateSiteUI(d) {
+    if (!d) d = calc();
+    document.getElementById('siteWDval').textContent = state.siteWD;
+    document.getElementById('siteCWval').textContent = state.siteCW;
+    document.getElementById('s-wd-cost').textContent = fmio(d.siteWDcost);
+    document.getElementById('s-wd-sub').textContent = state.siteWD + ' scales × ' + fmio(d.validated);
+    document.getElementById('s-cw-cost').textContent = fmio(d.siteCWcost);
+    document.getElementById('s-cw-sub').textContent = state.siteCW + ' scales × ' + fmio(d.unvalidated);
+    document.getElementById('s-total').textContent = fmio(d.siteTotal);
+    document.getElementById('s-total-sub').textContent = 'One-time · ' + (state.siteWD + state.siteCW) + ' scales';
+  }
+
+  function updateCompareUI(d) {
+    if (!d) d = calc();
+    document.getElementById('cmp-ews-y1').textContent = fmio(d.siteTotal);
+    document.getElementById('cmp-sav-y1').textContent = fmio(d.werumYears[0] - d.siteTotal);
+    for (let i=1; i<5; i++) {
+      const el_w = document.getElementById('cmp-werum-y'+(i+1));
+      const el_s = document.getElementById('cmp-sav-y'+(i+1));
+      if (el_w) el_w.textContent = fmio(d.werumYears[i]);
+      if (el_s) el_s.textContent = fmio(d.werumYears[i]);
+    }
+    document.getElementById('cmp-ews-total').textContent = fmio(d.siteTotal);
+    document.getElementById('cmp-werum-total').textContent = fmio(d.werumTotal);
+    document.getElementById('cmp-sav-total').textContent = fmio(d.sav5yr);
+    document.getElementById('banner-savings').textContent = fmio(d.sav5yr);
+    const pct = Math.round(d.sav5yr / d.werumTotal * 100);
+    document.getElementById('banner-pct').textContent = pct + '% reduction';
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    const idx = ['overview','per-scale','site','compare'].indexOf(name);
+    document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  }
+
+  const SITES = {
+    SAKA:   { wd: 8,  cw: 5 },
+    FIMA:   { wd: 3,  cw: 3 },
+    DANKOS: { wd: 23, cw: 9 },
+    KF:     { wd: 47, cw: 9 }
+  };
+
+  function selectSite(name, wd, cw) {
+    state.siteName = name;
+    state.siteWD = wd;
+    state.siteCW = cw;
+    document.getElementById('siteWD').value = wd;
+    document.getElementById('siteCW').value = cw;
+    document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('site-' + name).classList.add('active');
+    const d = calc();
+    updateSiteUI(d);
+    updateCompareUI(d);
+  }
+
+  function siteManual() {
+    state.siteWD = parseInt(document.getElementById('siteWD').value);
+    state.siteCW = parseInt(document.getElementById('siteCW').value);
+    document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+    const d = calc();
+    updateSiteUI(d);
+    updateCompareUI(d);
+  }
+
+  recalc();
+</script>
+</body>
+</html>
