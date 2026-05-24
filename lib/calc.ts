@@ -66,11 +66,11 @@ export function calc(state: SimState): CalcResult {
   const siteCWcost = state.siteCW * unvalidated
   const siteTotal = siteWDcost + siteCWcost
 
-  // Product 2: Annual support fee — (total investment × AMC rate) ÷ total scales
-  const annualAMC = totalInv * state.rate / 100
-  const annualFeePerScale = annualAMC / scales
+  // Product 2: Annual support fee — perpetual per scale × AMC rate (no division by total scales)
+  const annualFeePerScale = perScale * state.rate / 100
   const annualFeePerScaleMo = annualFeePerScale / 12
   const annualFeeForSite = (state.siteWD + state.siteCW) * annualFeePerScale
+  const annualAMC = annualFeePerScale * scales   // program-wide, derived from per-scale
   const fiveYearSupportCost = annualFeeForSite * state.horizon
 
   // Item breakdown: perpetual share per scale per component

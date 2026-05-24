@@ -255,7 +255,7 @@ export default function Simulator() {
                   {'          '}= <span style={{ color: 'white', fontWeight: 600 }}>{fmio(d.perScale)}</span> per scale<br />
                   <br />
                   <span className="comment">// PRODUCT 2 — Annual support fee (recurring)</span><br />
-                  Annual{'    '}= ({totalInvDisplay} × {rate}%) ÷ {totalScales}<br />
+                  Annual{'    '}= Perpetual × {rate}%<br />
                   {'          '}= <span style={{ color: '#A7F3D0' }}>{fmio(d.annualFeePerScale)}</span> per scale / yr
                 </div>
                 <div className="note">
@@ -294,7 +294,7 @@ export default function Simulator() {
                     <div className="metric-card" style={{ gridColumn: 'span 2' }}>
                       <div className="m-label">Annual AMC (whole program)</div>
                       <div className="m-val amber" style={{ fontSize: '22px' }}>{fmio(d.annualAMC)}</div>
-                      <div className="m-sub">Charged every year · {rate}% of IDR {totalInvDisplay} Mio</div>
+                      <div className="m-sub">Charged every year · {rate}% × perpetual per scale × {totalScales} scales</div>
                     </div>
                     <div className="metric-card">
                       <div className="m-label">Annual fee / scale / year</div>
@@ -378,7 +378,7 @@ export default function Simulator() {
                     <div className="metric-card">
                       <div className="m-label">Annual fee / scale / year</div>
                       <div className="m-val blue">{fmio(d.annualFeePerScale)}</div>
-                      <div className="m-sub">(Total Inv × {rate}%) ÷ {totalScales}</div>
+                      <div className="m-sub">Perpetual per scale × {rate}%</div>
                     </div>
                     <div className="metric-card">
                       <div className="m-label">Annual fee / scale / month</div>
