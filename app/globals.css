@@ -382,6 +382,80 @@ input[type=range]::-moz-range-thumb {
 .bar-legend .leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-muted); }
 .bar-legend .dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
+/* EDITABLE INVESTMENT ROWS */
+.cost-row.editable { align-items: center; gap: 6px; }
+
+.cost-name-input {
+  border: none;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color 0.15s;
+}
+.cost-name-input:focus { border-bottom-color: var(--teal); }
+.cost-name-input::placeholder { color: var(--gray-300); }
+
+.cost-val-input {
+  border: none;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  outline: none;
+  text-align: right;
+  width: 60px;
+  padding: 0;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+.cost-val-input::-webkit-inner-spin-button,
+.cost-val-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.cost-val-input:focus { border-bottom-color: var(--teal); }
+
+.cost-row-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+.remove-item-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--gray-300);
+  font-size: 15px;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+.remove-item-btn:hover { color: #DC2626; }
+
+.add-item-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px;
+  font-size: 11px;
+  font-family: var(--font);
+  font-weight: 500;
+  color: var(--teal-dark);
+  background: var(--teal-light);
+  border: 1px dashed var(--teal-mid);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.add-item-btn:hover {
+  background: var(--teal);
+  color: white;
+  border-style: solid;
+}
+
 /* FOOTER */
 .footer {
   text-align: center;

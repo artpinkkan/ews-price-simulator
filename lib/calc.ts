@@ -1,9 +1,24 @@
-const INV = { rd: 720, hw: 322, as_: 720 }
-const TOTAL_INV = 1762
 const WERUM_BASE = 750
 const WERUM_GROWTH = 0.05
 
+export interface InvestmentItem {
+  id: string
+  label: string
+  value: number
+}
+
+export const DEFAULT_ITEMS: InvestmentItem[] = [
+  { id: 'rd', label: 'Product R&D & Dev Readiness',       value: 720 },
+  { id: 'hw', label: 'Hardware IT, Machinery & Equipment', value: 322 },
+  { id: 'as', label: 'After-Sales Support (L3, L4)',       value: 720 },
+]
+
+export const ITEM_COLORS = [
+  '#1D9E75', '#185FA5', '#BA7517', '#7C3AED', '#DC2626', '#059669', '#D97706',
+]
+
 export interface SimState {
+  items: InvestmentItem[]
   rate: number
   horizon: number
   totalScales: number
@@ -12,6 +27,7 @@ export interface SimState {
 }
 
 export interface CalcResult {
+  totalInv: number
   amc: number
   cumAMC: number
   perScale: number
@@ -19,12 +35,8 @@ export interface CalcResult {
   unvalidated: number
   amcPerScaleYr: number
   amcPerScaleMo: number
-  rdPortion: number
-  hwPortion: number
-  asPortion: number
-  rdPct: number
-  hwPct: number
-  asPct: number
+  itemPortions: number[]
+  itemPcts: number[]
   siteWDcost: number
   siteCWcost: number
   siteTotal: number
@@ -34,21 +46,22 @@ export interface CalcResult {
 }
 
 export function calc(state: SimState): CalcResult {
-  const amc = TOTAL_INV * state.rate / 100
+  const totalInv = state.items.reduce((sum, item) => sum + (item.value || 0), 0)
+  const amc = totalInv * state.rate / 100
   const cumAMC = amc * state.horizon
-  const perScale = cumAMC / state.totalScales
+  const scales = state.totalScales || 1
+  const perScale = cumAMC / scales
   const validated = perScale * 1.2
   const unvalidated = perScale * 0.8
-  const amcPerScaleYr = amc / state.totalScales
+  const amcPerScaleYr = amc / scales
   const amcPerScaleMo = amcPerScaleYr / 12
 
-  const rdPortion = (INV.rd * state.rate / 100 * state.horizon) / state.totalScales
-  const hwPortion = (INV.hw * state.rate / 100 * state.horizon) / state.totalScales
-  const asPortion = (INV.as_ * state.rate / 100 * state.horizon) / state.totalScales
-
-  const rdPct = (INV.rd / TOTAL_INV) * 100
-  const hwPct = (INV.hw / TOTAL_INV) * 100
-  const asPct = (INV.as_ / TOTAL_INV) * 100
+  const itemPortions = state.items.map(item =>
+    ((item.value || 0) * state.rate / 100 * state.horizon) / scales
+  )
+  const itemPcts = state.items.map(item =>
+    totalInv > 0 ? ((item.value || 0) / totalInv) * 100 : 0
+  )
 
   const siteWDcost = state.siteWD * validated
   const siteCWcost = state.siteCW * unvalidated
@@ -64,8 +77,8 @@ export function calc(state: SimState): CalcResult {
   const sav5yr = werumTotal - siteTotal
 
   return {
-    amc, cumAMC, perScale, validated, unvalidated, amcPerScaleYr, amcPerScaleMo,
-    rdPortion, hwPortion, asPortion, rdPct, hwPct, asPct,
+    totalInv, amc, cumAMC, perScale, validated, unvalidated,
+    amcPerScaleYr, amcPerScaleMo, itemPortions, itemPcts,
     siteWDcost, siteCWcost, siteTotal, werumYears, werumTotal, sav5yr,
   }
 }

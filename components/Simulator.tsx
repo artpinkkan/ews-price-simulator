@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { calc, SITES } from '@/lib/calc'
+import { calc, SITES, DEFAULT_ITEMS, ITEM_COLORS, type InvestmentItem } from '@/lib/calc'
 import { fmio } from '@/lib/format'
 
 type Tab = 'overview' | 'per-scale' | 'site' | 'compare'
 
+let nextId = DEFAULT_ITEMS.length
+
 export default function Simulator() {
+  const [items, setItems] = useState<InvestmentItem[]>(DEFAULT_ITEMS)
   const [rate, setRate] = useState(20)
   const [horizon, setHorizon] = useState(5)
   const [totalScales, setTotalScales] = useState(114)
@@ -16,9 +19,26 @@ export default function Simulator() {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
   const d = useMemo(
-    () => calc({ rate, horizon, totalScales, siteWD, siteCW }),
-    [rate, horizon, totalScales, siteWD, siteCW]
+    () => calc({ items, rate, horizon, totalScales, siteWD, siteCW }),
+    [items, rate, horizon, totalScales, siteWD, siteCW]
   )
+
+  function updateLabel(id: string, label: string) {
+    setItems(prev => prev.map(it => it.id === id ? { ...it, label } : it))
+  }
+
+  function updateValue(id: string, raw: string) {
+    const value = raw === '' ? 0 : parseFloat(raw)
+    setItems(prev => prev.map(it => it.id === id ? { ...it, value: isNaN(value) ? 0 : value } : it))
+  }
+
+  function addItem() {
+    setItems(prev => [...prev, { id: String(++nextId), label: '', value: 0 }])
+  }
+
+  function removeItem(id: string) {
+    setItems(prev => prev.filter(it => it.id !== id))
+  }
 
   function selectSite(name: string) {
     const site = SITES[name]
@@ -26,6 +46,8 @@ export default function Simulator() {
     setSiteWD(site.wd)
     setSiteCW(site.cw)
   }
+
+  const totalInvDisplay = d.totalInv.toLocaleString('en-US')
 
   return (
     <>
@@ -56,21 +78,44 @@ export default function Simulator() {
               </div>
               <div className="panel-body">
                 <div className="sec-label">Base cost structure (IDR Mio)</div>
-                <div className="cost-row">
-                  <span className="cost-name">Product R&amp;D &amp; Dev Readiness</span>
-                  <span className="cost-val">720</span>
-                </div>
-                <div className="cost-row">
-                  <span className="cost-name">Hardware IT, Machinery &amp; Equipment</span>
-                  <span className="cost-val">322</span>
-                </div>
-                <div className="cost-row">
-                  <span className="cost-name">After-Sales Support (L3, L4)</span>
-                  <span className="cost-val">720</span>
-                </div>
-                <div className="cost-row total">
+
+                {items.map((item, i) => (
+                  <div key={item.id} className="cost-row editable">
+                    <input
+                      className="cost-name-input"
+                      value={item.label}
+                      placeholder="Item name"
+                      onChange={e => updateLabel(item.id, e.target.value)}
+                    />
+                    <div className="cost-row-actions">
+                      <input
+                        className="cost-val-input"
+                        type="number"
+                        value={item.value || ''}
+                        placeholder="0"
+                        min={0}
+                        onChange={e => updateValue(item.id, e.target.value)}
+                      />
+                      {items.length > 1 && (
+                        <button
+                          className="remove-item-btn"
+                          onClick={() => removeItem(item.id)}
+                          title="Remove item"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                <button className="add-item-btn" onClick={addItem}>
+                  + Add item
+                </button>
+
+                <div className="cost-row total" style={{ marginTop: '8px' }}>
                   <span className="cost-name">Total Investment</span>
-                  <span className="cost-val">IDR 1,762 Mio</span>
+                  <span className="cost-val">IDR {totalInvDisplay} Mio</span>
                 </div>
 
                 <div className="divider" />
@@ -121,7 +166,7 @@ export default function Simulator() {
               <div className="panel-body">
                 <div className="formula-box">
                   <span className="comment">// Annual AMC</span><br />
-                  AMC = 1,762 × {rate}% = <span>{d.amc.toFixed(1)}</span> Mio<br /><br />
+                  AMC = {totalInvDisplay} × {rate}% = <span>{d.amc.toFixed(1)}</span> Mio<br /><br />
                   <span className="comment">// Perpetual per scale</span><br />
                   P = (AMC × {horizon}) ÷ {totalScales}<br />
                   P = <span style={{ color: 'white', fontWeight: 500 }}>{fmio(d.perScale)}</span>
@@ -183,28 +228,39 @@ export default function Simulator() {
 
                   <div className="sec-label">Cost component breakdown</div>
                   <div className="bar-legend">
-                    <div className="leg"><div className="dot" style={{ background: '#1D9E75' }} />R&D (720)</div>
-                    <div className="leg"><div className="dot" style={{ background: '#185FA5' }} />Hardware (322)</div>
-                    <div className="leg"><div className="dot" style={{ background: '#BA7517' }} />After-Sales (720)</div>
+                    {items.map((item, i) => (
+                      <div key={item.id} className="leg">
+                        <div className="dot" style={{ background: ITEM_COLORS[i % ITEM_COLORS.length] }} />
+                        {item.label || `Item ${i + 1}`} ({item.value})
+                      </div>
+                    ))}
                   </div>
                   <div className="breakdown-bar">
-                    <div className="seg" style={{ background: '#1D9E75', width: `${d.rdPct}%` }} />
-                    <div className="seg" style={{ background: '#185FA5', width: `${d.hwPct}%` }} />
-                    <div className="seg" style={{ background: '#BA7517', width: `${d.asPct}%` }} />
+                    {items.map((item, i) => (
+                      <div
+                        key={item.id}
+                        className="seg"
+                        style={{ background: ITEM_COLORS[i % ITEM_COLORS.length], width: `${d.itemPcts[i]}%` }}
+                      />
+                    ))}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', marginTop: '8px' }}>
-                    <div className="metric-card">
-                      <div className="m-label">R&D portion / scale</div>
-                      <div className="m-val teal" style={{ fontSize: '14px' }}>{fmio(d.rdPortion)}</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="m-label">Hardware portion</div>
-                      <div className="m-val blue" style={{ fontSize: '14px' }}>{fmio(d.hwPortion)}</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="m-label">After-Sales portion</div>
-                      <div className="m-val amber" style={{ fontSize: '14px' }}>{fmio(d.asPortion)}</div>
-                    </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)`,
+                    gap: '6px',
+                    marginTop: '8px',
+                  }}>
+                    {items.map((item, i) => (
+                      <div key={item.id} className="metric-card">
+                        <div className="m-label">{item.label || `Item ${i + 1}`} / scale</div>
+                        <div
+                          className="m-val"
+                          style={{ fontSize: '14px', color: ITEM_COLORS[i % ITEM_COLORS.length] }}
+                        >
+                          {fmio(d.itemPortions[i])}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
