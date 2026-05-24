@@ -255,7 +255,7 @@ export default function Simulator() {
                   {'          '}= <span style={{ color: 'white', fontWeight: 600 }}>{fmio(d.perScale)}</span> per scale<br />
                   <br />
                   <span className="comment">// PRODUCT 2 — Annual support fee (recurring)</span><br />
-                  Annual{'    '}= Perpetual × {rate}%<br />
+                  Annual{'    '}= {fmio(d.perScale)} × {rate}%<br />
                   {'          '}= <span style={{ color: '#A7F3D0' }}>{fmio(d.annualFeePerScale)}</span> per scale / yr
                 </div>
                 <div className="note">
