@@ -100,7 +100,7 @@ export function calc(state: SimState): CalcResult {
 
 export const SITES: Record<string, { wd: number; cw: number; total: number }> = {
   SAKA:   { wd: 15, cw: 5,  total: 20 },
-  FIMA:   { wd: 3,  cw: 3,  total: 6  },
+  FIMA:   { wd: 6,  cw: 3,  total: 9  },
   DANKOS: { wd: 23, cw: 9,  total: 32 },
   KF:     { wd: 47, cw: 9,  total: 56 },
 }
