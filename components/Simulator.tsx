@@ -457,32 +457,34 @@ export default function Simulator() {
                     </div>
                   </div>
 
-                  <div className="cost-row editable" style={{ marginTop: '10px' }}>
-                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-100)', fontWeight: 600 }}>Implementation Fee</span>
-                    <div className="cost-row-actions">
-                      <input
-                        className="cost-val-input"
-                        type="number"
-                        value={implFee || ''}
-                        placeholder="0"
-                        min={0}
-                        onChange={e => setImplFee(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
-                      />
-                      <span style={{ fontSize: '11px', color: 'var(--gray-200)', marginLeft: '4px' }}>Mio</span>
+                  <div className="metric-grid" style={{ marginTop: '10px' }}>
+                    <div className="metric-card">
+                      <div className="m-label">Implementation Fee <span style={{ color: 'var(--teal)', fontWeight: 400 }}>· editable</span></div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '4px' }}>
+                        <input
+                          className="fee-input"
+                          type="number"
+                          value={implFee || ''}
+                          placeholder="0"
+                          min={0}
+                          onChange={e => setImplFee(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
+                        />
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>IDR Mio</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="cost-row editable">
-                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-100)', fontWeight: 600 }}>Add-ons</span>
-                    <div className="cost-row-actions">
-                      <input
-                        className="cost-val-input"
-                        type="number"
-                        value={addOns || ''}
-                        placeholder="0"
-                        min={0}
-                        onChange={e => setAddOns(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
-                      />
-                      <span style={{ fontSize: '11px', color: 'var(--gray-200)', marginLeft: '4px' }}>Mio</span>
+                    <div className="metric-card">
+                      <div className="m-label">Add-ons <span style={{ color: 'var(--teal)', fontWeight: 400 }}>· editable</span></div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '4px' }}>
+                        <input
+                          className="fee-input"
+                          type="number"
+                          value={addOns || ''}
+                          placeholder="0"
+                          min={0}
+                          onChange={e => setAddOns(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
+                        />
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>IDR Mio</span>
+                      </div>
                     </div>
                   </div>
 
