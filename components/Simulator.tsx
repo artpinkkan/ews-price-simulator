@@ -430,7 +430,7 @@ export default function Simulator() {
                   </div>
 
                   <div className="cost-row editable" style={{ marginTop: '10px' }}>
-                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-300)' }}>Implementation Fee</span>
+                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-100)', fontWeight: 600 }}>Implementation Fee</span>
                     <div className="cost-row-actions">
                       <input
                         className="cost-val-input"
@@ -440,11 +440,11 @@ export default function Simulator() {
                         min={0}
                         onChange={e => setImplFee(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
                       />
-                      <span style={{ fontSize: '11px', color: 'var(--gray-400)', marginLeft: '4px' }}>Mio</span>
+                      <span style={{ fontSize: '11px', color: 'var(--gray-200)', marginLeft: '4px' }}>Mio</span>
                     </div>
                   </div>
                   <div className="cost-row editable">
-                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-300)' }}>Add-ons</span>
+                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-100)', fontWeight: 600 }}>Add-ons</span>
                     <div className="cost-row-actions">
                       <input
                         className="cost-val-input"
@@ -454,7 +454,7 @@ export default function Simulator() {
                         min={0}
                         onChange={e => setAddOns(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
                       />
-                      <span style={{ fontSize: '11px', color: 'var(--gray-400)', marginLeft: '4px' }}>Mio</span>
+                      <span style={{ fontSize: '11px', color: 'var(--gray-200)', marginLeft: '4px' }}>Mio</span>
                     </div>
                   </div>
 
