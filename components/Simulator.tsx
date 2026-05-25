@@ -297,21 +297,49 @@ export default function Simulator() {
 
                 {/* TAB: Overview */}
                 <div className={`tab-pane${activeTab === 'overview' ? ' active' : ''}`}>
-                  <div className="sec-label">Annual support fee — program level</div>
-                  <div className="metric-grid">
-                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
-                      <div className="m-label">Annual AMC (whole program)</div>
-                      <div className="m-val amber" style={{ fontSize: '22px' }}>{fmio(d.annualAMC)}</div>
-                      <div className="m-sub">Charged every year · Total Investment × {rate}%</div>
-                    </div>
-                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
-                      <div className="m-label">Cumulative AMC over {horizon} years</div>
-                      <div className="m-val blue">{fmio(d.cumulativeAMC)}</div>
-                      <div className="m-sub">Annual AMC × {horizon} yr</div>
-                    </div>
-                  </div>
+                  <div className="sec-label">All-sites summary — AMC &amp; Investment</div>
+                  <table className="comp-table">
+                    <thead>
+                      <tr>
+                        <th>Site</th>
+                        <th style={{ textAlign: 'right' }}>Scales</th>
+                        <th style={{ textAlign: 'right' }}>Perpetual (one-time)</th>
+                        <th style={{ textAlign: 'right' }}>Annual AMC</th>
+                        <th style={{ textAlign: 'right' }}>{horizon}-yr AMC</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(SITES).map(([name, site]) => {
+                        const perpetual = site.wd * d.validated + site.cw * d.unvalidated
+                        const annualAMC = perpetual * rate / 100
+                        return (
+                          <tr key={name}>
+                            <td><strong>{name}</strong> <span style={{ color: 'var(--gray-400)', fontWeight: 400 }}>{site.wd}WD · {site.cw}CW</span></td>
+                            <td className="num">{site.total}</td>
+                            <td className="num">{fmio(perpetual)}</td>
+                            <td className="num" style={{ color: '#D97706' }}>{fmio(annualAMC)}</td>
+                            <td className="num">{fmio(annualAMC * horizon)}</td>
+                          </tr>
+                        )
+                      })}
+                      {(() => {
+                        const totalPerp = Object.values(SITES).reduce((s, site) => s + site.wd * d.validated + site.cw * d.unvalidated, 0)
+                        const totalAnnual = totalPerp * rate / 100
+                        const totalScalesAll = Object.values(SITES).reduce((s, site) => s + site.total, 0)
+                        return (
+                          <tr className="total">
+                            <td>Total (all sites)</td>
+                            <td className="num">{totalScalesAll}</td>
+                            <td className="num">{fmio(totalPerp)}</td>
+                            <td className="num" style={{ color: '#D97706' }}>{fmio(totalAnnual)}</td>
+                            <td className="num">{fmio(totalAnnual * horizon)}</td>
+                          </tr>
+                        )
+                      })()}
+                    </tbody>
+                  </table>
 
-                  <div className="sec-label">Investment component breakdown</div>
+                  <div className="sec-label" style={{ marginTop: '1.25rem' }}>Investment component breakdown</div>
                   <div className="bar-legend">
                     {items.map((item, i) => (
                       <div key={item.id} className="leg">
