@@ -5,7 +5,7 @@ import { calc, SITES, DEFAULT_ITEMS, ITEM_COLORS, type InvestmentItem } from '@/
 import { fmio } from '@/lib/format'
 import { loadState, saveState, clearState, exportJSON, importJSON } from '@/lib/storage'
 
-type Tab = 'overview' | 'per-scale' | 'site' | 'compare'
+type Tab = 'overview' | 'per-scale' | 'site'
 
 let nextId = DEFAULT_ITEMS.length
 
@@ -276,13 +276,13 @@ export default function Simulator() {
               <div className="panel-body">
 
                 <div className="tabs">
-                  {(['overview', 'per-scale', 'site', 'compare'] as Tab[]).map((tab, i) => (
+                  {(['overview', 'per-scale', 'site'] as Tab[]).map((tab, i) => (
                     <button
                       key={tab}
                       className={`tab-btn${activeTab === tab ? ' active' : ''}`}
                       onClick={() => setActiveTab(tab)}
                     >
-                      {['Overview', 'Per scale', 'Site view', 'vs Werum'][i]}
+                      {['Overview', 'Per scale', 'Site view'][i]}
                     </button>
                   ))}
                 </div>
@@ -461,56 +461,6 @@ export default function Simulator() {
                   </div>
                 </div>
 
-                {/* TAB: vs Werum */}
-                <div className={`tab-pane${activeTab === 'compare' ? ' active' : ''}`}>
-                  <div className="sec-label">Site-level comparison — eWS perpetual (one-time) vs Werum recurring AMC</div>
-                  <table className="comp-table">
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th style={{ textAlign: 'right' }}>eWS perpetual</th>
-                        <th style={{ textAlign: 'right' }}>Werum AMC</th>
-                        <th style={{ textAlign: 'right' }}>Savings</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Year 1</td>
-                        <td className="num">{fmio(d.siteTotal)}</td>
-                        <td className="num">{fmio(d.werumYears[0])}</td>
-                        <td className="num savings">{fmio(d.werumYears[0] - d.siteTotal)}</td>
-                      </tr>
-                      {[1, 2, 3, 4].map(i => (
-                        <tr key={i}>
-                          <td>Year {i + 1}</td>
-                          <td className="num">—</td>
-                          <td className="num">{fmio(d.werumYears[i])}</td>
-                          <td className="num savings">{fmio(d.werumYears[i])}</td>
-                        </tr>
-                      ))}
-                      <tr className="total">
-                        <td>5-year total</td>
-                        <td className="num">{fmio(d.siteTotal)}</td>
-                        <td className="num">{fmio(d.werumTotal)}</td>
-                        <td className="num savings">{fmio(d.sav5yr)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <div className="savings-banner">
-                    <div>
-                      <div className="s-label">5-year cost avoidance (this site)</div>
-                      <div className="s-val">{fmio(d.sav5yr)}</div>
-                    </div>
-                    <div className="s-badge">
-                      {Math.round(d.sav5yr / d.werumTotal * 100)}% reduction
-                    </div>
-                  </div>
-
-                  <div className="note">
-                    Werum AMC assumed at IDR 750 Mio/site/year base, increasing 5% annually (per feasibility study). eWS perpetual is paid once with no recurring scale fee.
-                  </div>
-                </div>
 
               </div>
             </div>

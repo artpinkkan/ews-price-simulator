@@ -1,5 +1,3 @@
-const WERUM_BASE = 750
-const WERUM_GROWTH = 0.05
 
 export interface InvestmentItem {
   id: string
@@ -45,10 +43,6 @@ export interface CalcResult {
   itemPortions: number[]
   itemPcts: number[]
 
-  // vs Werum
-  werumYears: number[]
-  werumTotal: number
-  sav5yr: number
 }
 
 export function calc(state: SimState): CalcResult {
@@ -73,22 +67,11 @@ export function calc(state: SimState): CalcResult {
     totalInv > 0 ? ((item.value || 0) / totalInv) * 100 : 0
   )
 
-  // vs Werum
-  const werumYears: number[] = []
-  let w = WERUM_BASE
-  for (let i = 0; i < 5; i++) {
-    werumYears.push(w)
-    w = w * (1 + WERUM_GROWTH)
-  }
-  const werumTotal = werumYears.reduce((a, b) => a + b, 0)
-  const sav5yr = werumTotal - siteTotal
-
   return {
     totalInv,
     perScale, validated, unvalidated, siteWDcost, siteCWcost, siteTotal,
     annualAMC, cumulativeAMC,
     itemPortions, itemPcts,
-    werumYears, werumTotal, sav5yr,
   }
 }
 
