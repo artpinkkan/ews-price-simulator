@@ -365,26 +365,6 @@ export default function Simulator() {
                     </div>
                   </div>
 
-                  <div className="divider" />
-
-                  {/* Section B */}
-                  <div className="sec-label">Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring · charged separately each year</span></div>
-                  <div className="metric-grid">
-                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
-                      <div className="m-label">Annual AMC (whole program)</div>
-                      <div className="m-val amber">{fmio(d.annualAMC)}</div>
-                      <div className="m-sub">Total Investment × {rate}% — constant, not divided by scale count</div>
-                    </div>
-                    <div className="metric-card" style={{ gridColumn: 'span 2' }}>
-                      <div className="m-label">Cumulative AMC over {horizon} years</div>
-                      <div className="m-val blue">{fmio(d.cumulativeAMC)}</div>
-                      <div className="m-sub">Annual AMC × {horizon} yr</div>
-                    </div>
-                  </div>
-
-                  <div className="note">
-                    These two products are charged at different times and must never be added together. The perpetual license is a one-time settlement; the annual support fee is billed separately each year.
-                  </div>
                 </div>
 
                 {/* TAB: Site View */}
