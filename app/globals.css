@@ -594,18 +594,18 @@ input[type=range]::-moz-range-thumb {
   font-family: var(--mono);
   font-size: 20px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--gray-800);
   outline: none;
   width: 100%;
   padding: 0;
-  border-bottom: 2px solid rgba(255,255,255,0.15);
+  border-bottom: 2px solid rgba(0,0,0,0.15);
   transition: border-color 0.15s;
   -moz-appearance: textfield;
 }
 .fee-input::-webkit-inner-spin-button,
 .fee-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 .fee-input:focus { border-bottom-color: var(--teal); }
-.fee-input::placeholder { color: rgba(255,255,255,0.25); }
+.fee-input::placeholder { color: rgba(0,0,0,0.25); }
 
 .remove-item-btn {
   border: none;

@@ -469,7 +469,7 @@ export default function Simulator() {
                           min={0}
                           onChange={e => setImplFee(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
                         />
-                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>IDR Mio</span>
+                        <span style={{ fontSize: '11px', color: 'var(--gray-400)', flexShrink: 0 }}>IDR Mio</span>
                       </div>
                     </div>
                     <div className="metric-card">
@@ -483,7 +483,7 @@ export default function Simulator() {
                           min={0}
                           onChange={e => setAddOns(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
                         />
-                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>IDR Mio</span>
+                        <span style={{ fontSize: '11px', color: 'var(--gray-400)', flexShrink: 0 }}>IDR Mio</span>
                       </div>
                     </div>
                   </div>
