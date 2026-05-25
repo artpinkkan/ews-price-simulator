@@ -21,6 +21,8 @@ export default function Simulator() {
   const [siteWD, setSiteWD] = useState(15)
   const [siteCW, setSiteCW] = useState(5)
   const [siteName, setSiteName] = useState('SAKA')
+  const [implFee, setImplFee] = useState(0)
+  const [addOns, setAddOns] = useState(0)
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const isFirstRender = useRef(true)
@@ -36,6 +38,8 @@ export default function Simulator() {
       setSiteWD(saved.siteWD)
       setSiteCW(saved.siteCW)
       setSiteName(saved.siteName)
+      setImplFee(saved.implFee ?? 0)
+      setAddOns(saved.addOns ?? 0)
       // keep nextId above any loaded item ids
       const maxId = Math.max(...saved.items.map(it => Number(it.id) || 0))
       if (maxId >= nextId) nextId = maxId + 1
@@ -46,14 +50,14 @@ export default function Simulator() {
   // Auto-save whenever state changes (skip the initial mount)
   useEffect(() => {
     if (isFirstRender.current) return
-    saveState({ items, rate, horizon, totalScales, siteWD, siteCW, siteName })
+    saveState({ items, rate, horizon, totalScales, siteWD, siteCW, siteName, implFee, addOns })
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     setSavedAt(now)
-  }, [items, rate, horizon, totalScales, siteWD, siteCW, siteName])
+  }, [items, rate, horizon, totalScales, siteWD, siteCW, siteName, implFee, addOns])
 
   const d = useMemo(
-    () => calc({ items, rate, horizon, totalScales, siteWD, siteCW }),
-    [items, rate, horizon, totalScales, siteWD, siteCW]
+    () => calc({ items, rate, horizon, totalScales, siteWD, siteCW, implFee, addOns }),
+    [items, rate, horizon, totalScales, siteWD, siteCW, implFee, addOns]
   )
 
   function updateLabel(id: string, label: string) {
@@ -90,11 +94,13 @@ export default function Simulator() {
     setSiteWD(15)
     setSiteCW(5)
     setSiteName('SAKA')
+    setImplFee(0)
+    setAddOns(0)
     setSavedAt(null)
   }
 
   function handleExport() {
-    exportJSON({ items, rate, horizon, totalScales, siteWD, siteCW, siteName })
+    exportJSON({ items, rate, horizon, totalScales, siteWD, siteCW, siteName, implFee, addOns })
   }
 
   async function handleImport() {
@@ -107,6 +113,8 @@ export default function Simulator() {
       setSiteWD(state.siteWD)
       setSiteCW(state.siteCW)
       setSiteName(state.siteName)
+      setImplFee(state.implFee ?? 0)
+      setAddOns(state.addOns ?? 0)
     } catch {
       alert('Could not read file. Make sure it is a valid eWS simulator JSON.')
     }
@@ -407,7 +415,7 @@ export default function Simulator() {
                     />
                   </div>
 
-                  <div className="sec-label">Section A — Perpetual License (one-time)</div>
+                  <div className="sec-label">Section A — Site Quotation (one-time)</div>
                   <div className="metric-grid">
                     <div className="metric-card">
                       <div className="m-label">WD perpetual cost</div>
@@ -419,23 +427,55 @@ export default function Simulator() {
                       <div className="m-val blue">{fmio(d.siteCWcost)}</div>
                       <div className="m-sub">{siteCW} scales × {fmio(d.unvalidated)}</div>
                     </div>
-                    <div className="metric-card hero">
-                      <div className="m-label">Total perpetual (this site)</div>
-                      <div className="m-val">{fmio(d.siteTotal)}</div>
-                      <div className="m-sub">One-time · {siteScales} scales</div>
+                  </div>
+
+                  <div className="cost-row editable" style={{ marginTop: '10px' }}>
+                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-300)' }}>Implementation Fee</span>
+                    <div className="cost-row-actions">
+                      <input
+                        className="cost-val-input"
+                        type="number"
+                        value={implFee || ''}
+                        placeholder="0"
+                        min={0}
+                        onChange={e => setImplFee(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
+                      />
+                      <span style={{ fontSize: '11px', color: 'var(--gray-400)', marginLeft: '4px' }}>Mio</span>
+                    </div>
+                  </div>
+                  <div className="cost-row editable">
+                    <span className="cost-name" style={{ fontSize: '13px', color: 'var(--gray-300)' }}>Add-ons</span>
+                    <div className="cost-row-actions">
+                      <input
+                        className="cost-val-input"
+                        type="number"
+                        value={addOns || ''}
+                        placeholder="0"
+                        min={0}
+                        onChange={e => setAddOns(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
+                      />
+                      <span style={{ fontSize: '11px', color: 'var(--gray-400)', marginLeft: '4px' }}>Mio</span>
                     </div>
                   </div>
 
-                  <div className="sec-label" style={{ marginTop: '1rem' }}>Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring · program-wide constant</span></div>
+                  <div className="metric-grid" style={{ marginTop: '10px' }}>
+                    <div className="metric-card hero" style={{ gridColumn: 'span 2' }}>
+                      <div className="m-label">Total site quotation</div>
+                      <div className="m-val">{fmio(d.siteQuotation)}</div>
+                      <div className="m-sub">Perpetual + Implementation Fee + Add-ons · one-time</div>
+                    </div>
+                  </div>
+
+                  <div className="sec-label" style={{ marginTop: '1rem' }}>Section B — Annual Support Fee <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: '10px', color: 'var(--amber)', fontWeight: 500 }}>recurring · based on site quotation</span></div>
                   <div className="metric-grid">
                     <div className="metric-card" style={{ gridColumn: 'span 2' }}>
-                      <div className="m-label">Annual AMC (whole program)</div>
-                      <div className="m-val amber">{fmio(d.annualAMC)}</div>
-                      <div className="m-sub">Total Investment × {rate}% — not site-specific</div>
+                      <div className="m-label">Annual AMC (this site)</div>
+                      <div className="m-val amber">{fmio(d.siteAnnualAMC)}</div>
+                      <div className="m-sub">{fmio(d.siteQuotation)} × {rate}%</div>
                     </div>
                     <div className="metric-card" style={{ gridColumn: 'span 2' }}>
                       <div className="m-label">Cumulative AMC over {horizon} years</div>
-                      <div className="m-val">{fmio(d.cumulativeAMC)}</div>
+                      <div className="m-val blue">{fmio(d.siteCumulativeAMC)}</div>
                       <div className="m-sub">Annual × {horizon} years</div>
                     </div>
                   </div>

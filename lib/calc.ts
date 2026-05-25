@@ -22,6 +22,8 @@ export interface SimState {
   totalScales: number
   siteWD: number
   siteCW: number
+  implFee: number     // Implementation fee for site (IDR Mio)
+  addOns: number      // Add-ons for site (IDR Mio)
 }
 
 export interface CalcResult {
@@ -35,14 +37,18 @@ export interface CalcResult {
   siteCWcost: number
   siteTotal: number
 
-  // Product 2 — Annual support fee: flat = totalInv × AMC rate (not per scale)
+  // Product 2 — Program-level annual support fee
   annualAMC: number
   cumulativeAMC: number   // annualAMC × horizon
+
+  // Site-level quotation and annual support fee
+  siteQuotation: number       // siteTotal + implFee + addOns
+  siteAnnualAMC: number       // siteQuotation × rate%
+  siteCumulativeAMC: number   // siteAnnualAMC × horizon
 
   // Breakdown (% and per-scale share of investment)
   itemPortions: number[]
   itemPcts: number[]
-
 }
 
 export function calc(state: SimState): CalcResult {
@@ -57,9 +63,14 @@ export function calc(state: SimState): CalcResult {
   const siteCWcost = state.siteCW * unvalidated
   const siteTotal = siteWDcost + siteCWcost
 
-  // Product 2: Annual support fee — flat constant = total investment × AMC rate
+  // Product 2: Program-level annual support fee
   const annualAMC = totalInv * state.rate / 100
   const cumulativeAMC = annualAMC * state.horizon
+
+  // Site-level quotation and annual support fee
+  const siteQuotation = siteTotal + (state.implFee || 0) + (state.addOns || 0)
+  const siteAnnualAMC = siteQuotation * state.rate / 100
+  const siteCumulativeAMC = siteAnnualAMC * state.horizon
 
   // Item breakdown: perpetual share per scale per component
   const itemPortions = state.items.map(item => (item.value || 0) / scales)
@@ -71,6 +82,7 @@ export function calc(state: SimState): CalcResult {
     totalInv,
     perScale, validated, unvalidated, siteWDcost, siteCWcost, siteTotal,
     annualAMC, cumulativeAMC,
+    siteQuotation, siteAnnualAMC, siteCumulativeAMC,
     itemPortions, itemPcts,
   }
 }

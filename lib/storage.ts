@@ -10,6 +10,8 @@ export interface PersistedState {
   siteWD: number
   siteCW: number
   siteName: string
+  implFee: number
+  addOns: number
 }
 
 export function loadState(): PersistedState | null {
